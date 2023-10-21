@@ -9,24 +9,24 @@ namespace TP_Integrador
 {
     abstract class Operador
     {
-        int id;        
-        int capacidadBateria;
-        int mAhActuales;
-        bool standby; //true= STANDBY, false=OPERATIVO
-        int cargaMaxima;
-        int cargaActual;
-        double velocidadOptima;
-        double velocidadActual;
-        string localizacion;
+        protected int id;
+        protected int capacidadBateria;
+        protected int mAhActuales;
+        protected bool standby; //true= STANDBY, false=OPERATIVO
+        protected int cargaPesoMaximo; //Carga de peso, no de batería
+        protected int cargaPesoActual; //Carga de peso, no de batería
+        protected double velocidadOptima;
+        protected double velocidadActual;
+        protected string localizacion;
 
-        protected Operador(int id, int capacidadBateria, int mAhActuales, int cargaMaxima, double velocidadOptima, string localizacion)
+        protected Operador(int id, int capacidadBateria, int mAhActuales, int cargaPesoMaxima, double velocidadOptima, string localizacion)
         {
             this.id = id;
             this.capacidadBateria = capacidadBateria;            
             this.mAhActuales = mAhActuales;
             standby = false;
-            this.cargaMaxima = cargaMaxima;
-            cargaActual = 0;
+            this.cargaPesoMaximo = cargaPesoMaxima;
+            cargaPesoActual = 0;
             this.velocidadOptima = velocidadOptima;
             velocidadActual = CalcularVelocidadActual(CalcularNivelBateria(this.mAhActuales));
             this.localizacion = localizacion.ToUpper();            
@@ -37,8 +37,8 @@ namespace TP_Integrador
             this.id = id;
             capacidadBateria = 0;
             mAhActuales = 0;
-            cargaMaxima = 0;
-            cargaActual = 0;
+            cargaPesoMaximo = 0;
+            cargaPesoActual = 0;
             velocidadOptima = 0;
             velocidadActual = CalcularVelocidadActual(mAhActuales);
             localizacion = string.Empty;
@@ -68,7 +68,7 @@ namespace TP_Integrador
             else
                 mAhActuales -= mAhConsumidos;
 
-            velocidadActual = CalcularVelocidadActual(CalcularNivelBateria(this.mAhActuales));
+            velocidadActual = CalcularVelocidadActual(CalcularNivelBateria(mAhActuales));
         }
 
         protected void CargarBatería(int mAhAñadidos)
@@ -78,16 +78,16 @@ namespace TP_Integrador
             else
                 mAhActuales += mAhAñadidos;
 
-            velocidadActual = CalcularVelocidadActual(CalcularNivelBateria(this.mAhActuales));
+            velocidadActual = CalcularVelocidadActual(CalcularNivelBateria(mAhActuales));
         }
 
         protected bool AñadirCargaFisica(int kilos)
         {
             bool añadido = false;
 
-            if (kilos < cargaMaxima && (kilos + cargaActual) < cargaMaxima)
+            if (kilos < cargaPesoMaximo && (kilos + cargaPesoActual) < cargaPesoMaximo)
             {
-                cargaActual += kilos;
+                cargaPesoActual += kilos;
                 añadido = true;
             }
 
@@ -96,10 +96,10 @@ namespace TP_Integrador
 
         protected void DescargarCargaFisica(int kilos)
         {
-            if(kilos > cargaActual)
-                cargaActual = 0;
+            if(kilos > cargaPesoActual)
+                cargaPesoActual = 0;
             else
-                cargaActual -= kilos;
+                cargaPesoActual -= kilos;
         }
 
         public bool Moverse(string localizacion, int kilometrosARecorrer)
@@ -108,21 +108,20 @@ namespace TP_Integrador
             int mAhConsumidos = 0;
             int nivelBateria = CalcularNivelBateria(mAhActuales);
             double velocidad = velocidadActual;
-            int mAhBajaVelocidad = Convert.ToInt32(capacidadBateria / 100); //Cada cuantos mAh se me baja la velocidad
-            double tiempoBajaVelocidad = Math.Round((mAhBajaVelocidad * 0.001), 2); //Cada cuanto tiempo me baja la velocidad          
-            
+            double tiempoUso = Math.Round(((capacidadBateria / 100) * 0.001), 2); //Calcula cuanto tiempo de uso tengo con 1% de batería         
+
             if (localizacion.ToUpper().Equals("CUARTEL"))
             {
                 seMovio = true;
                 kilometrosARecorrer = 0;
             }
 
-            while(kilometrosARecorrer > 0 && nivelBateria > 0)
+            while(!standby && kilometrosARecorrer > 0 && nivelBateria > 0)
             {
-                kilometrosARecorrer -= Convert.ToInt32(tiempoBajaVelocidad * velocidad);
-                nivelBateria--;
-                mAhConsumidos += capacidadBateria / 100;
-                velocidad = CalcularVelocidadActual(nivelBateria);
+                kilometrosARecorrer -= Convert.ToInt32(tiempoUso * velocidad); //Le resta el resultado de calcular cuantos kilometros recorri con 1% de batería
+                nivelBateria--; //Resta 1% de batería
+                mAhConsumidos += capacidadBateria / 100; //Agrega la cantidad de mAh correspondientes a 1% a la cantidad de mAh consumidos
+                velocidad = CalcularVelocidadActual(nivelBateria); //Calcula la velocidad correspondiente al nivel de batería
 
                 if (nivelBateria > 0 && kilometrosARecorrer <= 0)
                     seMovio = true;
@@ -142,7 +141,7 @@ namespace TP_Integrador
             bool transferenciaRealizada = false;
             int bateriaFaltanteDonatorio = operadorDonatario.capacidadBateria - operadorDonatario.mAhActuales;
 
-            if (localizacion.Equals(operadorDonatario.localizacion) && !standby)
+            if (!standby && localizacion.Equals(operadorDonatario.localizacion))
             {
                 operadorDonatario.CargarBatería(mAhActuales);
                 DescargarBateria(bateriaFaltanteDonatorio);
@@ -156,9 +155,9 @@ namespace TP_Integrador
         {
             bool transferenciaRealizada = false;
 
-            if (localizacion.Equals(operadorDonatario.localizacion) && operadorDonatario.AñadirCargaFisica(cargaActual) && !standby)
+            if (!standby && localizacion.Equals(operadorDonatario.localizacion) && operadorDonatario.AñadirCargaFisica(cargaPesoActual))
             {
-                DescargarCargaFisica(cargaActual);
+                DescargarCargaFisica(cargaPesoActual);
                 transferenciaRealizada = true;
             }
 
@@ -172,7 +171,7 @@ namespace TP_Integrador
             if (!standby)
             {
                 Moverse("cuartel", 0);
-                DescargarCargaFisica(cargaActual);
+                DescargarCargaFisica(cargaPesoActual);
                 vueltaYDescarga = true;
             }
 
@@ -186,7 +185,7 @@ namespace TP_Integrador
             if (!standby)
             {
                 Moverse("cuartel", 0);
-                CargarBatería((capacidadBateria - cargaActual));
+                CargarBatería((capacidadBateria - mAhActuales));
                 vueltaYCarga = true;
             }
 

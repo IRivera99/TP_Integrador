@@ -12,7 +12,7 @@ namespace TP_Integrador
         static void Main(string[] args)
         {
             //TEST!
-            int mAhActuales = 1500;
+            int mAhActuales = 6500;
             int capacidadBateria = 6500;            
             double velocidadOptima = 50;
             double velocidadActual = CalcularVelocidadActual(CalcularNivelBateria(mAhActuales));
@@ -46,12 +46,12 @@ namespace TP_Integrador
 
             bool Moverse(string localizacion, int kilometrosARecorrer)
             {
+                int kilometrosRecorridos;
                 bool seMovio = false;
                 int mAhConsumidos = 0;
                 int nivelBateria = CalcularNivelBateria(mAhActuales);
                 double velocidad = velocidadActual;                
-                int mAhBajaVelocidad = Convert.ToInt32(capacidadBateria / 100); //Cada cuantos mAh se me baja la velocidad
-                double tiempoBajaVelocidad = Math.Round((mAhBajaVelocidad * 0.001), 2); //Cada cuanto tiempo me baja la velocidad
+                double tiempoUso = Math.Round(((capacidadBateria / 100) * 0.001), 2); //Calcula cuanto tiempo de uso tengo con 1% de batería
 
                 if (localizacion.ToUpper().Equals("CUARTEL"))
                 {
@@ -61,7 +61,8 @@ namespace TP_Integrador
 
                 while (kilometrosARecorrer > 0 && nivelBateria > 0)
                 {
-                    kilometrosARecorrer -= Convert.ToInt32(tiempoBajaVelocidad * velocidad);
+                    kilometrosRecorridos = Convert.ToInt32(tiempoUso * velocidad); //Calcula cuantos kilometros recorri con 1% de batería
+                    kilometrosARecorrer -= kilometrosRecorridos;
                     nivelBateria--;
                     mAhConsumidos += capacidadBateria / 100;
                     velocidad = CalcularVelocidadActual(nivelBateria);
@@ -82,6 +83,9 @@ namespace TP_Integrador
             Console.WriteLine($"{mAhActuales}");
             Console.WriteLine($"{velocidadActual}");
             Console.WriteLine(Moverse("CACA", 44));
+            Console.WriteLine($"{mAhActuales}");
+            Console.WriteLine($"{velocidadActual}");
+            Console.WriteLine(Moverse("cuartel", 44));
             Console.WriteLine($"{mAhActuales}");
             Console.WriteLine($"{velocidadActual}");
             //int mAhBajaVelocidad = Convert.ToInt32((10 * 6500) / 100);
