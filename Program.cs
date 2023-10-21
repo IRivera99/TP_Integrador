@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Creado por Ignacio Rivera
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace TP_Integrador
     {
         static void Main(string[] args)
         {
+            //TEST!
             int mAhActuales = 1500;
             int capacidadBateria = 6500;            
             double velocidadOptima = 50;

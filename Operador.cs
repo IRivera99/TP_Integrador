@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Creado por Ignacio Rivera
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace TP_Integrador
         int id;        
         int capacidadBateria;
         int mAhActuales;
-        bool standby; //true= OPERATIVO, false=STANDBY
+        bool standby; //true= STANDBY, false=OPERATIVO
         int cargaMaxima;
         int cargaActual;
         double velocidadOptima;
