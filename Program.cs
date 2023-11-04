@@ -11,90 +11,61 @@ namespace TP_Integrador
     {
         static void Main(string[] args)
         {
-            //TEST!
-            int mAhActuales = 6500;
-            int capacidadBateria = 6500;            
-            double velocidadOptima = 50;
-            double velocidadActual = CalcularVelocidadActual(CalcularNivelBateria(mAhActuales));
+            Quarter cuartel = new Quarter("Cuartel");
 
-            double CalcularVelocidadActual(int porcentajeBateria)
-            {
-                double velocidad = velocidadOptima;
+            AddOperatorsToQuarter(cuartel, 10);
 
-                for (int i = (porcentajeBateria - 100); i <= -10; i += 10)
-                {
-                    velocidad -= velocidadOptima * 0.05;
-                }
+            
 
-                return velocidad;
-            }
-
-            int CalcularNivelBateria(int mAh)
-            {
-                return Convert.ToInt32((mAh * 100) / capacidadBateria);
-            }
-
-            void DescargarBateria(int mAhConsumidos)
-            {
-                if (mAhConsumidos > mAhActuales)
-                    mAhActuales = 0;
-                else
-                    mAhActuales -= mAhConsumidos;
-
-                velocidadActual = CalcularVelocidadActual(CalcularNivelBateria(mAhActuales));
-            }
-
-            bool Moverse(string localizacion, int kilometrosARecorrer)
-            {
-                int kilometrosRecorridos;
-                bool seMovio = false;
-                int mAhConsumidos = 0;
-                int nivelBateria = CalcularNivelBateria(mAhActuales);
-                double velocidad = velocidadActual;                
-                double tiempoUso = Math.Round(((capacidadBateria / 100) * 0.001), 2); //Calcula cuanto tiempo de uso tengo con 1% de batería
-
-                if (localizacion.ToUpper().Equals("CUARTEL"))
-                {
-                    seMovio = true;
-                    kilometrosARecorrer = 0;
-                }
-
-                while (kilometrosARecorrer > 0 && nivelBateria > 0)
-                {
-                    kilometrosRecorridos = Convert.ToInt32(tiempoUso * velocidad); //Calcula cuantos kilometros recorri con 1% de batería
-                    kilometrosARecorrer -= kilometrosRecorridos;
-                    nivelBateria--;
-                    mAhConsumidos += capacidadBateria / 100;
-                    velocidad = CalcularVelocidadActual(nivelBateria);
-
-                    if (nivelBateria > 0 && kilometrosARecorrer <= 0)
-                        seMovio = true;
-                }
-
-                if (seMovio)
-                {
-                    //this.localizacion = localizacion.ToUpper();
-                    DescargarBateria(mAhConsumidos);
-                }
-
-                return seMovio;
-            }
-            Console.WriteLine(Moverse("CACA", 45));
-            Console.WriteLine($"{mAhActuales}");
-            Console.WriteLine($"{velocidadActual}");
-            Console.WriteLine(Moverse("CACA", 44));
-            Console.WriteLine($"{mAhActuales}");
-            Console.WriteLine($"{velocidadActual}");
-            Console.WriteLine(Moverse("cuartel", 44));
-            Console.WriteLine($"{mAhActuales}");
-            Console.WriteLine($"{velocidadActual}");
-            //int mAhBajaVelocidad = Convert.ToInt32((10 * 6500) / 100);
-            //double tiempoBajaVelocidad = Math.Round((mAhBajaVelocidad*0.001), 2);
-            //int distRecorridaAntesBaja = Convert.ToInt32(tiempoBajaVelocidad * 35);
-            //Console.WriteLine($"cada cuanto mha me baja velocidad: {mAhBajaVelocidad}mAh");
-            //Console.WriteLine($"cada cuanto tiempo me baja velocidad: {tiempoBajaVelocidad}hrs");
-            //Console.WriteLine($"cuantos km hago antes que me baje velocidad: {distRecorridaAntesBaja}kms");
             Console.ReadLine();
+        }
+
+        static void ListOperators(Quarter quarter)
+        {
+            Console.WriteLine("====================================");
+            foreach (Operator op in quarter.GetOperators())
+            {
+                Console.WriteLine(op.ToString() +
+                    "\n====================================");
+
+            }
+        }
+        
+        static void AddOperatorsToQuarter(Quarter quarter, int amount)
+        {
+            Random random = new Random();
+            string[] localizations = { "CORDOBA", "CUARTEL", "BUENOS AIRES", "SAN JUAN", "MENDOZA", "CHACO", "TUCUMAN" };
+
+            for (int i = 0; i < amount; i++)
+            {
+                int id = random.Next(0, amount + 100);
+                string localization = localizations[random.Next(0, localizations.Length - 1)];
+
+                switch (random.Next(0,3))
+                {
+                    case 0:
+                        {
+                            UAV uav = new UAV(id, localization, random.Next(30, 60));
+                            quarter.AddOperator(uav);
+                        }                        
+                        break;
+                    case 1:
+                        {
+                            K9 k9 = new K9(id, localization, random.Next(20, 50));
+                            quarter.AddOperator(k9);
+                        }                        
+                        break;
+                    case 2:
+                        {
+                            M8 m8 = new M8(id, localization, random.Next(15, 40));
+                            quarter.AddOperator(m8);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
         }
     }
 }
