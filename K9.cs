@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Creado por Ignacio Rivera
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,8 @@ namespace TP_Integrador
 {
     class K9 : Operator
     {
-        int legs;
-
-        public K9(int id, string localization, double maxSpeed) : base(id, localization, maxSpeed)
+        public K9(int id, double maxSpeed, Locations location) : base(id, maxSpeed, location)
         {
-            legs = 4;
             battery = new Battery(6500);
             maxLoad = 40;
         }
@@ -20,6 +18,11 @@ namespace TP_Integrador
         public override string ToString()
         {
             return "Cuadrupedo K9 " + base.ToString();
+        }
+
+        public override string ToStringStateOnly()
+        {
+            return "Cuadrupedo K9 " + base.ToStringStateOnly();
         }
     }
 }

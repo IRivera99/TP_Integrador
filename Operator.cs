@@ -15,9 +15,9 @@ namespace TP_Integrador
         protected int maxLoad; 
         protected int actualLoad;
         protected double maxSpeed;
-        protected string localization;
+        protected Locations location;
 
-        protected Operator(int id, int batteryCapacity, int maxLoad, double maxSpeed, string localization)
+        protected Operator(int id, int batteryCapacity, int maxLoad, double maxSpeed, Locations location)
         {
             this.id = id;
             battery = new Battery(batteryCapacity);            
@@ -25,16 +25,16 @@ namespace TP_Integrador
             this.maxLoad = maxLoad;
             actualLoad = 0;
             this.maxSpeed = maxSpeed;
-            this.localization = localization.ToUpper();            
+            this.location = location;            
         }
 
-        protected Operator(int id, string localization, double maxSpeed)
+        protected Operator(int id, double maxSpeed, Locations location)
         {
             this.id = id;
             standBy = false;
             actualLoad = 0;
             this.maxSpeed = maxSpeed;
-            this.localization = localization.ToUpper();
+            this.location = location;
         }
 
         protected double CalculateActualSpeed()
@@ -72,9 +72,9 @@ namespace TP_Integrador
                 actualLoad -= kg;
         }
 
-        public string GetLocalization()
+        public Locations GetLocation()
         {
-            return localization;
+            return location;
         }
 
         public int GetId()
@@ -82,23 +82,32 @@ namespace TP_Integrador
             return id;
         }
 
-        public bool Travel(string localization, int kmToTravel)
+        public bool IsStandBy()
+        {
+            return standBy;
+        }
+
+        public void ChangeState(bool standBy)
+        {
+            this.standBy = standBy;
+        }
+
+        public bool Travel(Locations location)
         {
             bool done = false;
             double speed = CalculateActualSpeed();
+            int kmToTravel = (int)location;
             int milliAmpsToConsume = Convert.ToInt32((kmToTravel * 1000) / speed);
-            
 
-            if (localization.ToUpper().Equals("CUARTEL"))
+            if (location.Equals(this.location))
             {
                 done = true;
             }
 
-            if(!standBy && !done && battery.EnoughBattery(milliAmpsToConsume))
+            if(!standBy && !done && battery.ConsumeBattery(milliAmpsToConsume))
             {
                 done = true;
-                this.localization = localization.ToUpper();
-                battery.ConsumeBattery(milliAmpsToConsume);
+                this.location = location;
             }
 
             return done;
@@ -109,7 +118,7 @@ namespace TP_Integrador
             bool done = false;
             int batteryNeeded = opReciever.battery.GetBatteryNeeded();
 
-            if (!standBy && localization.Equals(opReciever.localization))
+            if (!standBy && location.Equals(opReciever.location))
             {
                 opReciever.battery.ChargeBattery(battery.GetCharge());
                 battery.ConsumeBattery(batteryNeeded);
@@ -123,7 +132,7 @@ namespace TP_Integrador
         {
             bool done = false;
 
-            if (!standBy && localization.Equals(opReciever.localization) && opReciever.AddLoad(actualLoad))
+            if (!standBy && location.Equals(opReciever.location) && opReciever.AddLoad(actualLoad))
             {
                 SubstractLoad(actualLoad);
                 done = true;
@@ -136,7 +145,7 @@ namespace TP_Integrador
         {
             if (!standBy)
             {
-                Travel("cuartel", 0);
+                Travel(Locations.Cuartel);
             }
         }
 
@@ -170,7 +179,7 @@ namespace TP_Integrador
 
         public override string ToString()
         {
-            string state = "Activo";
+            string state = "Operativo";
             if (standBy)
             {
                 state = "Stand By";
@@ -180,7 +189,23 @@ namespace TP_Integrador
                    "\nEstado: " + state +
                    "\nPeso: " + actualLoad + " / " + maxLoad + " kg" +
                    "\nVelocidad: " + CalculateActualSpeed() + " km/h" +
-                   "\nLocalización: " + localization;
+                   "\nLocalización: " + location.ToString().Replace('_', ' ');
+        }
+
+        public virtual string ToStringStateOnly()
+        {
+            string state = "Operativo";
+            if (standBy)
+            {
+                state = "Stand By";
+            }
+            return "ID: " + id +
+                   "\nEstado: " + state;
+        }
+
+        public string ToStringIdOnly()
+        {
+            return "ID: " + id;
         }
     }
 }

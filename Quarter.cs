@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Creado por Ignacio Rivera
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,14 +18,19 @@ namespace TP_Integrador
             operators = new List<Operator>();
         }
 
+        public string GetName()
+        {
+            return quarterName;
+        }
+
         public List<Operator> GetOperators()
         {
             return operators;
         }
 
-        public List<Operator> GetOperators(string localization)
+        public List<Operator> GetOperators(Locations location)
         {
-            return operators.FindAll(o => o.GetLocalization().Equals(localization.ToUpper()));
+            return operators.FindAll(o => o.GetLocation().Equals(location));
         }
         
         public Operator GetOperator(int id)
@@ -41,7 +47,7 @@ namespace TP_Integrador
                 op.ReturnToQuarter();
             }
 
-            Operator notReturned = operators.Find(o => !o.GetLocalization().Equals("CUARTEL"));
+            Operator notReturned = operators.Find(o => !o.GetLocation().Equals(Locations.Cuartel));
 
             if (notReturned == null)
             {
@@ -72,15 +78,29 @@ namespace TP_Integrador
             return operators.Remove(op);
         }
 
-        public bool MakeOperatorTravel(int id, string localization, int kmToTravel)
+        public bool MakeOperatorTravel(int id, Locations location)
         {
             bool done = false;
             int index = operators.FindIndex(o => o.GetId() == id);
 
             if (index > -1)
             {
-                done = operators[index].Travel(localization, kmToTravel);
+                done = operators[index].Travel(location);
             }           
+
+            return done;
+        }
+
+        public bool ChangeOperatorState(int id, bool standBy)
+        {
+            bool done = false;
+            int index = operators.FindIndex(o => o.GetId() == id);
+
+            if (index > -1)
+            {
+                operators[index].ChangeState(standBy);
+                done = true;
+            }
 
             return done;
         }

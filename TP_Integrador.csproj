@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Battery.cs" />
     <Compile Include="K9.cs" />
+    <Compile Include="Locations.cs" />
     <Compile Include="M8.cs" />
     <Compile Include="Operator.cs" />
     <Compile Include="Program.cs" />

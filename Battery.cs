@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Creado por Ignacio Rivera
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,20 +9,20 @@ namespace TP_Integrador
 {
     class Battery
     {
-        int maxMiliAmps;
-        int actualMiliAmps;
+        int maxMilliAmps;
+        int actualMilliAmps;
 
-        public Battery(int maxMiliAmps)
+        public Battery(int maxMilliAmps)
         {
-            this.maxMiliAmps = maxMiliAmps;
-            actualMiliAmps = maxMiliAmps;
+            this.maxMilliAmps = maxMilliAmps;
+            actualMilliAmps = maxMilliAmps;
         }
 
-        public bool EnoughBattery(int requestedMiliAmps)
+        public bool EnoughBattery(int requestedMilliAmps)
         {
             bool enough = false;
 
-            if (requestedMiliAmps <= actualMiliAmps)
+            if (requestedMilliAmps <= actualMilliAmps)
                 enough = true;
 
             return enough;
@@ -29,44 +30,48 @@ namespace TP_Integrador
 
         public int GetCharge()
         {
-            return actualMiliAmps;
+            return actualMilliAmps;
         }
 
         public int GetBatteryPercentage()
         {
-            return Convert.ToInt32((actualMiliAmps * 100) / maxMiliAmps);
+            return Convert.ToInt32((actualMilliAmps * 100) / maxMilliAmps);
         }
 
         public int GetBatteryNeeded()
         {
-            return maxMiliAmps - actualMiliAmps;
+            return maxMilliAmps - actualMilliAmps;
         }
 
-        public int ConsumeBattery(int mAh)
+        public bool ConsumeBattery(int mAh)
         {
-            if (EnoughBattery(mAh))
-                actualMiliAmps -= mAh;
+            bool canConsume = EnoughBattery(mAh);
 
-            return actualMiliAmps;
+            if (canConsume)
+            {
+                actualMilliAmps -= mAh;
+            }                
+
+            return canConsume;
         }
 
         public int ChargeBattery(int mAh)
         {
-            if((mAh + actualMiliAmps) > maxMiliAmps)
+            if((mAh + actualMilliAmps) > maxMilliAmps)
             {
-                actualMiliAmps = maxMiliAmps;
+                actualMilliAmps = maxMilliAmps;
             }
             else
             {
-                actualMiliAmps += mAh;
+                actualMilliAmps += mAh;
             }
 
-            return actualMiliAmps;
+            return actualMilliAmps;
         }
         
         public void ChargeFullBattery()
         {
-            actualMiliAmps = maxMiliAmps;
+            actualMilliAmps = maxMilliAmps;
         }
     }
 }
