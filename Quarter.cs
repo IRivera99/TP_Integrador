@@ -104,5 +104,18 @@ namespace TP_Integrador
 
             return done;
         }
+
+        public int GetMaxId()
+        {
+            int id = 0;
+            foreach (Operator op in operators) 
+            { 
+                if (op.GetId() > id)
+                {
+                    id = op.GetId();
+                }
+            }
+            return id;
+        }
     }
 }

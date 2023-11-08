@@ -9,18 +9,11 @@ namespace TP_Integrador
 {
     class Program
     {
-        static void Main(string[] args)
-        {
-            Quarter cuartel = new Quarter("Cuartel General");
+        static Menu menu = Menu.InicializeMenu();
 
-            const string homeOptions =
-                "1) Listar el estado de todos los operadores.\n" +
-                "2) Listar el estado de todos los operadores en una localización. \n" +
-                "3) Total recall. \n" +
-                "4) Seleccionar un operador. \n" +
-                "5) Agregar o remover un operador. \n" +
-                "0) Salir. \n" +
-                "Seleccione una opción";            
+        static void Main(string[] args)
+        {           
+            Quarter cuartel = new Quarter("Cuartel General");        
 
             AddRandomOperatorsToQuarter(cuartel, 20);
 
@@ -28,41 +21,42 @@ namespace TP_Integrador
 
             while(option != 0)
             {
-                option = ShowMenu(homeOptions, 5);
+                option = menu.ShowMainMenu();
                 Console.WriteLine();
 
                 if (option == 1)
                 {
-                    ListOperators(cuartel);
+                    PrintOperators(cuartel.GetOperators());
                     Console.ReadKey();
                 }                    
 
                 if (option == 2)
                 {
-                    ListOperatorsInLocation(cuartel);
+                    PrintOperatorsInLocation(cuartel);
                     Console.ReadKey();
                 }                    
 
                 if (option == 3)
                 {
-                    TotalRecall(cuartel);
+                    TotalRecallToQuarter(cuartel);
                     Console.ReadKey();
                 }                    
 
                 if (option == 4)
                 {
-                    UseOperator(cuartel);
+                    UseOperatorFromQuarter(cuartel);
                     Console.ReadKey();
                 }
 
                 if (option == 5)
                 {
-
+                    AdminOperatorsFromQuarter(cuartel);
                 }
             }                            
             
         }
 
+        //Quarters functions
         static void AddRandomOperatorsToQuarter(Quarter quarter, int amount)
         {
             Random random = new Random();
@@ -72,19 +66,19 @@ namespace TP_Integrador
                 bool added = false;
                 Operator op = null;
                 Locations location = GetRandomLocation(random);
-                int type = random.Next(0, 3);
+                OperatorTypes type = GetRandomOperatorType(random);
 
                 while (!added)
                 {
-                    int id = random.Next(0, amount + 100);
+                    int id = quarter.GetMaxId() + 1;
 
-                    if (type == 0)
+                    if (type == OperatorTypes.UAV)
                         op = new UAV(id, random.Next(30, 60), location);
 
-                    if (type == 1)
+                    if (type == OperatorTypes.K9)
                         op = new K9(id, random.Next(20, 50), location);
 
-                    if (type == 2)
+                    if (type == OperatorTypes.M8)
                         op = new M8(id, random.Next(15, 40), location);
 
                     added = quarter.AddOperator(op);
@@ -94,6 +88,201 @@ namespace TP_Integrador
             Console.WriteLine(quarter.GetOperators().Count);
         }
 
+        static void TotalRecallToQuarter(Quarter quarter)
+        {
+            Console.Clear();
+            if (quarter.TotalRecall())
+            {
+                Console.WriteLine("Todos los operadores en el cuartel!");
+            }
+            else
+            {
+                Console.WriteLine("Algunos operadores no pudieron volver a base...");
+            }
+        }
+
+        static void PrintOperators(List<Operator> operators)
+        {
+            foreach (Operator op in operators)
+            {
+                Console.WriteLine(op.ToStringStateOnly() +
+                    "\n------------------------------------");
+
+            }
+        }
+
+        static void PrintOperatorsInLocation(Quarter quarter)
+        {
+            Locations selectedLocation = SelectLocation();
+            if (selectedLocation != (Locations)(-1))
+            {
+                List<Operator> operatorsInLocation = quarter.GetOperators().FindAll(o => o.GetLocation() == selectedLocation);
+                Console.Clear();
+                if (operatorsInLocation.Count > 0)
+                {
+                    Console.WriteLine($"Operadores en {selectedLocation}\n");
+                    PrintOperators(operatorsInLocation);
+                }
+                else
+                {
+                    Console.WriteLine($"No hay operadores en {selectedLocation}");
+                }
+            }
+        }
+
+        static void UseOperatorFromQuarter(Quarter quarter)
+        {
+            Operator op;
+            int id = 0;
+
+            while (id != -1)
+            {
+                Console.Clear();
+                Console.WriteLine("Ingrese el ID del operador (-1 para volver atrás)");
+                id = InputControl.ReadIntOnly();
+                op = quarter.GetOperator(id);
+
+                if (op != null && op.IsStandBy())
+                {
+                    Console.Clear();
+                    Console.WriteLine("Selecciona otro operador, este está en Stand By");
+                    Console.ReadKey();
+                }
+
+                if (op != null && !op.IsStandBy())
+                {
+                    int option = menu.ShowOp4Menu();
+                    if (option == 1)
+                    {
+                        Locations selectedLocation = SelectLocation();
+                        if (selectedLocation != (Locations)(-1))
+                        {
+                            Console.Clear();
+                            if (quarter.MakeOperatorTravel(op.GetId(), selectedLocation))
+                            {
+                                Console.WriteLine("Viaje realizado con éxito!");
+                                Console.WriteLine(quarter.GetOperator(op.GetId()).ToString());
+                            }
+                            else
+                            {
+                                Console.WriteLine("No se pudo realizar el viaje...");
+                            }
+                            id = -1;
+                        }
+                    }
+                    if (option == 2)
+                    {
+                        Console.Clear();
+                        quarter.MakeOperatorTravel(op.GetId(), Locations.Cuartel);
+                        Console.WriteLine("Operador enviado a base!");
+                        id = -1;
+                    }
+                    if (option == 3)
+                    {
+                        Console.Clear();
+                        quarter.ChangeOperatorState(op.GetId(), true);
+                        Console.WriteLine("Operador en Stand By.");
+                        id = -1;
+                    }
+                }
+            }
+        }        
+
+        static void AdminOperatorsFromQuarter(Quarter quarter)
+        {
+            Console.Clear();
+            int option = -1;
+            while (option != 0)
+            {
+                option = menu.ShowOp5Menu();
+                if (option == 1)
+                {
+                    int subOption = menu.ShowOp5AddMenu();
+
+                    if (subOption != 0)
+                    {
+                        Random random = new Random();
+                        Operator op = null;
+                        Locations location = GetRandomLocation(random);
+                        OperatorTypes type = (OperatorTypes)(-1);
+                        bool added = false;
+
+                        if (subOption == 1)
+                        {
+                            type = GetRandomOperatorType(random);
+                        }
+
+                        if (subOption == 2)
+                        {
+                            type = SelectOperatorType();
+                        }
+
+                        while (!added)
+                        {
+                            int id = quarter.GetMaxId() + 1;
+
+                            if (type == OperatorTypes.UAV)
+                                op = new UAV(id, random.Next(30, 60), location);
+
+                            if (type == OperatorTypes.K9)
+                                op = new K9(id, random.Next(20, 50), location);
+
+                            if (type == OperatorTypes.M8)
+                                op = new M8(id, random.Next(15, 40), location);
+
+                            added = quarter.AddOperator(op);
+                        }
+
+                        Console.Clear();
+                        Console.WriteLine("Operador añadido con éxito");
+                        Console.WriteLine(op.ToString());
+                        Console.ReadLine();
+                    }
+                }
+                if (option == 2)
+                {
+                    int subOption = menu.ShowOp5DelMenu();
+                    if (subOption != 0 && subOption == 1) 
+                    {
+                        Random random = new Random();
+                        int id = random.Next(1,quarter.GetMaxId());
+                        if (quarter.RemoveOperator(id))
+                        {
+                            Console.WriteLine($"Operador con eliminado con éxito!(ID {id})");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Operador no encontrado...");
+                        }
+                        Console.ReadKey();
+                    }
+                    if (subOption != 0 && subOption == 2)
+                    {
+                        int id = 0;
+
+                        while (id != -1)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Ingrese el ID del operador (-1 para volver atrás)");
+                            id = InputControl.ReadIntOnly();
+                            bool removed = quarter.RemoveOperator(id);
+                            if (removed)
+                            {
+                                Console.WriteLine("Operador eliminado con éxito!");
+                                id = -1;
+                            }
+                            if (!removed && id != -1)
+                            {
+                                Console.WriteLine("Operador no encontrado...");
+                            }
+                            Console.ReadKey();
+                        }
+                    }
+                }
+            }
+        }
+
+        //Location functions
         static Locations GetRandomLocation(Random random)
         {
             Array locations = Enum.GetValues(typeof(Locations));
@@ -101,47 +290,23 @@ namespace TP_Integrador
             return (Locations)locations.GetValue(index);
         }
 
-        static void ListOperators(Quarter quarter)
-        {
-            Console.WriteLine($"Operadores del cuartel: '{quarter.GetName()}' \n");
-            foreach (Operator op in quarter.GetOperators())
-            {
-                Console.WriteLine(op.ToStringStateOnly() +
-                    "\n------------------------------------");
-
-            }
-        }
-
-        static void ListOperators(Quarter quarter, Locations location)
-        {
-            Console.WriteLine($"Operadores del cuartel '{quarter.GetName()}' en {location.ToString().Replace('_', ' ')}\n");
-            foreach (Operator op in quarter.GetOperators(location))
-            {
-                Console.WriteLine(op.ToStringStateOnly() +
-                    "\n------------------------------------");
-            }
-        }
-
-        static void ListOperatorsInLocation(Quarter quarter)
-        {
-            Locations selectedLocation = SelectLocation();
-            Console.WriteLine();
-            ListOperators(quarter, selectedLocation);
-        }
-
         static Locations SelectLocation()
-        {
-            int locationsAmount = Enum.GetValues(typeof(Locations)).Length;
-            string locationsList = "Listado de localizaciones\n" + LocationsListToString() + "\nSelecciona una localización";
-            int option = ShowMenu(locationsList, locationsAmount);
-            Locations selectedLocation;
+        {           
+            Locations location;
+            Array locationsArray = Enum.GetValues(typeof(Locations));
+            string locationsList = "Tipo de operadores\n" + LocationsListToString() + "\nSelecciona una opción (Para cancelar ingrese -1)";
+            int locationIndex = menu.ShowCustomOptionsMenu(locationsList, -1, locationsArray.Length - 1);
 
-            while (!FindLocation(option, out selectedLocation))
+            try
             {
-                option = ShowMenu(locationsList, locationsAmount);
+                location = (Locations)locationsArray.GetValue(locationIndex);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                location = (Locations)(-1);
             }
 
-            return selectedLocation;
+            return location;
         }
 
         static string LocationsListToString()
@@ -155,145 +320,46 @@ namespace TP_Integrador
             }
 
             return locationsString;
-        }       
+        }               
         
-        static int ShowMenu(string options, int optAmount)
+        //Operator types functions
+        static OperatorTypes SelectOperatorType()
         {
-            int option = -1;           
-
-            while (option > optAmount || option < 0)
-            {
-                Console.Clear();
-                Console.WriteLine(options);
-                try
-                {
-                    option = int.Parse(Console.ReadLine());
-                }
-                catch (FormatException)
-                {
-                    Console.WriteLine("Por favor ingrese solo números.");
-                    Console.ReadKey();
-                }
-            }
-
-            return option;
-        }       
-        
-        static bool FindLocation(int index, out Locations location)
-        {
-            bool found = true;
-            Array locations = Enum.GetValues(typeof(Locations));
+            OperatorTypes type;            
+            Array typesArray = Enum.GetValues(typeof(OperatorTypes));
+            string typesList = "Tipo de operadores\n" + OperatorsListTypeToString() + "\nSelecciona una opción (Para cancelar ingrese -1)";
+            int typeIndex = menu.ShowCustomOptionsMenu(typesList, -1, typesArray.Length - 1);
 
             try
             {
-                location = (Locations)locations.GetValue(index);
+                type = (OperatorTypes)typesArray.GetValue(typeIndex);
             }
             catch (IndexOutOfRangeException)
             {
-                found = false;
-                location = Locations.Cuartel;
-                Console.WriteLine("No se encontro la locación");
-                Console.ReadKey();
+                type = (OperatorTypes)(-1);
             }
 
-            return found;
-        }
-        
-        static void TotalRecall(Quarter quarter)
-        {
-            if (quarter.TotalRecall())
-            {
-                Console.WriteLine("Todos los operadores en el cuartel!");
-            }
-            else
-            {
-                Console.WriteLine("Hubo un error, algunos operadores no pudieron volver a base...");
-            }
+            return type;
         }
 
-        static void UseOperator(Quarter quarter)
+        static OperatorTypes GetRandomOperatorType(Random random)
         {
-            string opt4Sub =
-                "1) Enviarlo a una localización especial.\n" +
-                "2) Indicar retorno al cuartel. \n" +
-                "3) Cambiar estado. \n" +
-                "0) Volver atrás \n" +
-                "Seleccione una opción";
-            Operator op;
-            string entry = string.Empty;
-
-            while (!entry.Equals("-1"))
-            {
-                Console.Clear();
-                Console.WriteLine("Ingrese el ID del operador (-1 para volver atrás)");
-                entry = Console.ReadLine();
-                FindOperator(entry, quarter, out op);
-
-                if (op != null && op.IsStandBy())
-                {
-                    Console.Clear();
-                    Console.WriteLine("Selecciona otro operador, este está en Stand By");
-                    Console.ReadKey();
-                }
-
-                if (op != null && !op.IsStandBy())
-                {
-                    int option = ShowMenu(opt4Sub, 3);
-                    if (option == 1)
-                    {
-                        Locations selectedLocation = SelectLocation();
-                        Console.Clear();
-                        if(quarter.MakeOperatorTravel(op.GetId(), selectedLocation))
-                        {
-                            Console.WriteLine("Viaje realizado con éxito!");
-                            Console.WriteLine(quarter.GetOperator(op.GetId()).ToString());
-                        }
-                        else
-                        {
-                            Console.WriteLine("No se pudo realizar el viaje...");
-                        }
-                        entry = "-1";
-                    }
-                    if (option == 2)
-                    {
-                        Console.Clear();
-                        quarter.MakeOperatorTravel(op.GetId(), Locations.Cuartel);
-                        Console.WriteLine("Operador enviado a base!");
-                        entry = "-1";
-                    }
-                    if (option == 3)
-                    {
-                        Console.Clear();
-                        quarter.ChangeOperatorState(op.GetId(), true);
-                        Console.WriteLine("Operador en Stand By.");
-                        entry = "-1";
-                    }
-                }
-               
-            }            
+            Array typesArray = Enum.GetValues(typeof(OperatorTypes));
+            int index = random.Next(0, typesArray.Length);
+            return (OperatorTypes)typesArray.GetValue(index);
         }
 
-        static bool FindOperator(string entry, Quarter quarter, out Operator op)
+        static string OperatorsListTypeToString()
         {
-            bool found = true;
+            string typesString = string.Empty;            
+            Array types = Enum.GetValues(typeof(OperatorTypes));
 
-            try
+            for (int i = 0; i < types.Length; i++)
             {
-                int id = int.Parse(entry);
-                op = quarter.GetOperator(id);
-            }
-            catch (FormatException)
-            {
-                op = null;
-                found = false;
-                Console.WriteLine("Ingrese solo numeros.");
-                Console.ReadKey();
+                typesString += $"{i}) {types.GetValue(i)}\n";
             }
 
-            if (op == null)
-                found = false;
-
-            return found;
-        }        
+            return typesString;
+        }
     }
 }

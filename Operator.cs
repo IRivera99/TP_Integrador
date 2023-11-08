@@ -16,8 +16,9 @@ namespace TP_Integrador
         protected int actualLoad;
         protected double maxSpeed;
         protected Locations location;
+        protected OperatorTypes type;
 
-        protected Operator(int id, int batteryCapacity, int maxLoad, double maxSpeed, Locations location)
+        protected Operator(int id, int batteryCapacity, int maxLoad, double maxSpeed, Locations location, OperatorTypes type)
         {
             this.id = id;
             battery = new Battery(batteryCapacity);            
@@ -25,16 +26,18 @@ namespace TP_Integrador
             this.maxLoad = maxLoad;
             actualLoad = 0;
             this.maxSpeed = maxSpeed;
-            this.location = location;            
+            this.location = location;  
+            this.type = type;
         }
 
-        protected Operator(int id, double maxSpeed, Locations location)
+        protected Operator(int id, double maxSpeed, Locations location, OperatorTypes type)
         {
             this.id = id;
             standBy = false;
             actualLoad = 0;
             this.maxSpeed = maxSpeed;
             this.location = location;
+            this.type = type;
         }
 
         protected double CalculateActualSpeed()

@@ -9,7 +9,7 @@ namespace TP_Integrador
 {
     class UAV : Operator
     { 
-        public UAV(int id, double maxSpeed, Locations location) : base(id, maxSpeed, location)
+        public UAV(int id, double maxSpeed, Locations location) : base(id, maxSpeed, location, OperatorTypes.UAV)
         {
             battery = new Battery(4000);
             maxLoad = 5;

@@ -9,7 +9,7 @@ namespace TP_Integrador
 {
     class K9 : Operator
     {
-        public K9(int id, double maxSpeed, Locations location) : base(id, maxSpeed, location)
+        public K9(int id, double maxSpeed, Locations location) : base(id, maxSpeed, location, OperatorTypes.K9)
         {
             battery = new Battery(6500);
             maxLoad = 40;

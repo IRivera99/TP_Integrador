@@ -9,7 +9,7 @@ namespace TP_Integrador
 {
     class M8: Operator
     {
-        public M8(int id, double maxSpeed, Locations location) : base(id, maxSpeed, location)
+        public M8(int id, double maxSpeed, Locations location) : base(id, maxSpeed, location, OperatorTypes.M8)
         {
             battery = new Battery(12250);
             maxLoad = 250;
