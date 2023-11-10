@@ -15,10 +15,10 @@ namespace TP_Integrador
         protected int maxLoad; 
         protected int actualLoad;
         protected double maxSpeed;
-        protected Locations location;
+        protected LocationTypes location;
         protected OperatorTypes type;
 
-        protected Operator(int id, int batteryCapacity, int maxLoad, double maxSpeed, Locations location, OperatorTypes type)
+        protected Operator(int id, int batteryCapacity, int maxLoad, double maxSpeed, LocationTypes location, OperatorTypes type)
         {
             this.id = id;
             battery = new Battery(batteryCapacity);            
@@ -30,7 +30,7 @@ namespace TP_Integrador
             this.type = type;
         }
 
-        protected Operator(int id, double maxSpeed, Locations location, OperatorTypes type)
+        protected Operator(int id, double maxSpeed, LocationTypes location, OperatorTypes type)
         {
             this.id = id;
             standBy = false;
@@ -75,7 +75,7 @@ namespace TP_Integrador
                 actualLoad -= kg;
         }
 
-        public Locations GetLocation()
+        public LocationTypes GetLocation()
         {
             return location;
         }
@@ -95,7 +95,7 @@ namespace TP_Integrador
             this.standBy = standBy;
         }
 
-        public bool Travel(Locations location)
+        public bool Travel(LocationTypes location)
         {
             bool done = false;
             double speed = CalculateActualSpeed();
@@ -148,7 +148,7 @@ namespace TP_Integrador
         {
             if (!standBy)
             {
-                Travel(Locations.Cuartel);
+                Travel(LocationTypes.Cuartel);
             }
         }
 

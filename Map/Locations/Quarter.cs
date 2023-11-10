@@ -4,31 +4,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TP_Integrador.Map.Locations;
 
 namespace TP_Integrador
 {
-    class Quarter
+    class Quarter : Location
     {
         List<Operator> operators;
-        string quarterName;
 
-        public Quarter(string name)
-        {
-            quarterName = name;
+        public Quarter(string name, int coordX, int coordY) : base(name, coordX, coordY)
+        {            
             operators = new List<Operator>();
-        }
-
-        public string GetName()
-        {
-            return quarterName;
-        }
+            type = LocationTypes.Quarter;
+        }        
 
         public List<Operator> GetOperators()
         {
             return operators;
         }
 
-        public List<Operator> GetOperators(Locations location)
+        public List<Operator> GetOperators(LocationTypes location)
         {
             return operators.FindAll(o => o.GetLocation().Equals(location));
         }
@@ -47,7 +42,7 @@ namespace TP_Integrador
                 op.ReturnToQuarter();
             }
 
-            Operator notReturned = operators.Find(o => !o.GetLocation().Equals(Locations.Cuartel));
+            Operator notReturned = operators.Find(o => !o.GetLocation().Equals(LocationTypes.Cuartel));
 
             if (notReturned == null)
             {
@@ -78,7 +73,7 @@ namespace TP_Integrador
             return operators.Remove(op);
         }
 
-        public bool MakeOperatorTravel(int id, Locations location)
+        public bool MakeOperatorTravel(int id, LocationTypes location)
         {
             bool done = false;
             int index = operators.FindIndex(o => o.GetId() == id);

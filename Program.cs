@@ -65,7 +65,7 @@ namespace TP_Integrador
             {
                 bool added = false;
                 Operator op = null;
-                Locations location = GetRandomLocation(random);
+                LocationTypes location = GetRandomLocation(random);
                 OperatorTypes type = GetRandomOperatorType(random);
 
                 while (!added)
@@ -113,8 +113,8 @@ namespace TP_Integrador
 
         static void PrintOperatorsInLocation(Quarter quarter)
         {
-            Locations selectedLocation = SelectLocation();
-            if (selectedLocation != (Locations)(-1))
+            LocationTypes selectedLocation = SelectLocation();
+            if (selectedLocation != (LocationTypes)(-1))
             {
                 List<Operator> operatorsInLocation = quarter.GetOperators().FindAll(o => o.GetLocation() == selectedLocation);
                 Console.Clear();
@@ -154,8 +154,8 @@ namespace TP_Integrador
                     int option = menu.ShowOp4Menu();
                     if (option == 1)
                     {
-                        Locations selectedLocation = SelectLocation();
-                        if (selectedLocation != (Locations)(-1))
+                        LocationTypes selectedLocation = SelectLocation();
+                        if (selectedLocation != (LocationTypes)(-1))
                         {
                             Console.Clear();
                             if (quarter.MakeOperatorTravel(op.GetId(), selectedLocation))
@@ -173,7 +173,7 @@ namespace TP_Integrador
                     if (option == 2)
                     {
                         Console.Clear();
-                        quarter.MakeOperatorTravel(op.GetId(), Locations.Cuartel);
+                        quarter.MakeOperatorTravel(op.GetId(), LocationTypes.Cuartel);
                         Console.WriteLine("Operador enviado a base!");
                         id = -1;
                     }
@@ -203,7 +203,7 @@ namespace TP_Integrador
                     {
                         Random random = new Random();
                         Operator op = null;
-                        Locations location = GetRandomLocation(random);
+                        LocationTypes location = GetRandomLocation(random);
                         OperatorTypes type = (OperatorTypes)(-1);
                         bool added = false;
 
@@ -283,27 +283,27 @@ namespace TP_Integrador
         }
 
         //Location functions
-        static Locations GetRandomLocation(Random random)
+        static LocationTypes GetRandomLocation(Random random)
         {
-            Array locations = Enum.GetValues(typeof(Locations));
+            Array locations = Enum.GetValues(typeof(LocationTypes));
             int index = random.Next(0, locations.Length);
-            return (Locations)locations.GetValue(index);
+            return (LocationTypes)locations.GetValue(index);
         }
 
-        static Locations SelectLocation()
+        static LocationTypes SelectLocation()
         {           
-            Locations location;
-            Array locationsArray = Enum.GetValues(typeof(Locations));
+            LocationTypes location;
+            Array locationsArray = Enum.GetValues(typeof(LocationTypes));
             string locationsList = "Tipo de operadores\n" + LocationsListToString() + "\nSelecciona una opción (Para cancelar ingrese -1)";
             int locationIndex = menu.ShowCustomOptionsMenu(locationsList, -1, locationsArray.Length - 1);
 
             try
             {
-                location = (Locations)locationsArray.GetValue(locationIndex);
+                location = (LocationTypes)locationsArray.GetValue(locationIndex);
             }
             catch (IndexOutOfRangeException)
             {
-                location = (Locations)(-1);
+                location = (LocationTypes)(-1);
             }
 
             return location;
@@ -312,7 +312,7 @@ namespace TP_Integrador
         static string LocationsListToString()
         {
             string locationsString = string.Empty;
-            Array locations = Enum.GetValues(typeof(Locations));
+            Array locations = Enum.GetValues(typeof(LocationTypes));
 
             for (int i = 0; i < locations.Length; i++)
             {

@@ -7,22 +7,22 @@ using System.Threading.Tasks;
 
 namespace TP_Integrador
 {
-    class M8: Operator
-    {
-        public M8(int id, double maxSpeed, Locations location) : base(id, maxSpeed, location, OperatorTypes.M8)
+    class UAV : Operator
+    { 
+        public UAV(int id, double maxSpeed, LocationTypes location) : base(id, maxSpeed, location, OperatorTypes.UAV)
         {
-            battery = new Battery(12250);
-            maxLoad = 250;
+            battery = new Battery(4000);
+            maxLoad = 5;
         }
 
         public override string ToString()
         {
-            return "Semi-Humanoide M8 " + base.ToString();
+            return "Dron UAV " + base.ToString();
         }
 
         public override string ToStringStateOnly()
         {
-            return "Semi-Humanoide M8 " + base.ToStringStateOnly();
+            return "Dron UAV " + base.ToStringStateOnly();
         }
     }
 }
