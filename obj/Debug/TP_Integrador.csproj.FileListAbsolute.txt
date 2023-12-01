@@ -5,3 +5,15 @@ G:\Curso NEORIS\Proyectos\TP_Integrador\obj\Debug\TP_Integrador.csproj.AssemblyR
 G:\Curso NEORIS\Proyectos\TP_Integrador\obj\Debug\TP_Integrador.csproj.CoreCompileInputs.cache
 G:\Curso NEORIS\Proyectos\TP_Integrador\obj\Debug\TP_Integrador.exe
 G:\Curso NEORIS\Proyectos\TP_Integrador\obj\Debug\TP_Integrador.pdb
+G:\Curso NEORIS\Proyectos\TP_Integrador\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+G:\Curso NEORIS\Proyectos\TP_Integrador\bin\Debug\System.Buffers.dll
+G:\Curso NEORIS\Proyectos\TP_Integrador\bin\Debug\System.Memory.dll
+G:\Curso NEORIS\Proyectos\TP_Integrador\bin\Debug\System.Numerics.Vectors.dll
+G:\Curso NEORIS\Proyectos\TP_Integrador\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+G:\Curso NEORIS\Proyectos\TP_Integrador\bin\Debug\System.Text.Encodings.Web.dll
+G:\Curso NEORIS\Proyectos\TP_Integrador\bin\Debug\System.Text.Json.dll
+G:\Curso NEORIS\Proyectos\TP_Integrador\bin\Debug\System.Threading.Tasks.Extensions.dll
+G:\Curso NEORIS\Proyectos\TP_Integrador\bin\Debug\System.ValueTuple.dll
+G:\Curso NEORIS\Proyectos\TP_Integrador\obj\Debug\TP_Integrador.csproj.SuggestedBindingRedirects.cache
+G:\Curso NEORIS\Proyectos\TP_Integrador\obj\Debug\TP_Integrador.exe.config
+G:\Curso NEORIS\Proyectos\TP_Integrador\obj\Debug\TP_Integrador.csproj.CopyComplete

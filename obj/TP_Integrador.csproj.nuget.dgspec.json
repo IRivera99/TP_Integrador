@@ -1,0 +1,60 @@
+{
+  "format": 1,
+  "restore": {
+    "G:\\Curso NEORIS\\Proyectos\\TP_Integrador\\TP_Integrador.csproj": {}
+  },
+  "projects": {
+    "G:\\Curso NEORIS\\Proyectos\\TP_Integrador\\TP_Integrador.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\Curso NEORIS\\Proyectos\\TP_Integrador\\TP_Integrador.csproj",
+        "projectName": "TP_Integrador",
+        "projectPath": "G:\\Curso NEORIS\\Proyectos\\TP_Integrador\\TP_Integrador.csproj",
+        "packagesPath": "C:\\Users\\Nacho\\.nuget\\packages\\",
+        "outputPath": "G:\\Curso NEORIS\\Proyectos\\TP_Integrador\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\Nacho\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "dependencies": {
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-arm64": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}

@@ -2,17 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using TP_Integrador.Territory.Locations;
 
-namespace TP_Integrador
+namespace TP_Integrador.Operators.Types
 {
     class K9 : Operator
     {
-        public K9(int id, double maxSpeed, LocationTypes location) : base(id, maxSpeed, location, OperatorTypes.K9)
+        public K9(int id, double maxSpeed, Quarter quarter) : base(id, maxSpeed, quarter, OperatorTypes.K9)
         {
             battery = new Battery(6500);
-            maxLoad = 40;
+            maxLoad = 40;            
         }
 
         public override string ToString()
@@ -23,6 +25,6 @@ namespace TP_Integrador
         public override string ToStringStateOnly()
         {
             return "Cuadrupedo K9 " + base.ToStringStateOnly();
-        }
+        }                
     }
 }

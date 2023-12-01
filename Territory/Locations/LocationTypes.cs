@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TP_Integrador.Map.Locations
+namespace TP_Integrador.Territory.Locations
 {
     enum LocationTypes
     {
@@ -13,6 +13,7 @@ namespace TP_Integrador.Map.Locations
         Verter,
         Lake,
         Quarter,
-        Recycling
+        Recycling,
+        ElectricVerter
     }
 }
