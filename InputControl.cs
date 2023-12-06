@@ -25,7 +25,7 @@ namespace TP_Integrador
                 catch (FormatException)
                 {
                     Console.WriteLine("Error! Por favor ingrese solo números.");
-                    Console.ReadKey();
+                    Console.ReadLine();
                 }                
             }
             return intReturn;

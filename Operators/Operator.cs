@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TP_Integrador.Territory;
 using TP_Integrador.Operators.Types;
 using TP_Integrador.Territory.Locations;
+using System.Text.Json.Serialization;
 
 namespace TP_Integrador.Operators
 {
@@ -15,7 +16,7 @@ namespace TP_Integrador.Operators
         protected int id;
         protected Battery battery;
         protected bool standBy; //true= STANDBY, false = OPERATIVE
-        protected int maxLoad; 
+        protected int maxLoad;
         protected int actualLoad;
         protected double maxSpeed;
         protected Location location;
@@ -23,34 +24,46 @@ namespace TP_Integrador.Operators
         protected OperatorTypes type;
 
         public int Id { get; }
-        public bool StandBy { get; }    
-
-        protected Operator(int id, int batteryCapacity, int maxLoad, double maxSpeed, Quarter quarter, OperatorTypes type)
-        {
-            this.id = id;
-            battery = new Battery(batteryCapacity);            
-            standBy = false;
-            this.maxLoad = maxLoad;
-            actualLoad = 0;
-            this.maxSpeed = maxSpeed;
-            origin = quarter;
-            location = origin;
-            this.type = type;
-            Id = id;
-            StandBy = false;
-        }
+        public double MaxSpeed {get; }
+        public bool StandBy { get; } 
+        public OperatorTypes Type { get; }              
 
         protected Operator(int id, double maxSpeed, Quarter quarter, OperatorTypes type)
         {
             this.id = id;
+            Id = id;
             standBy = false;
+            StandBy = false;
+            actualLoad = 0;
+            this.maxSpeed = maxSpeed;
+            origin = quarter;
+            location = origin;
+            this.type = type;         
+        }
+
+        protected Operator(int id, double maxSpeed, bool standBy, Quarter quarter, OperatorTypes type)
+        {
+            this.id = id;
+            Id = id;
+            this.standBy = standBy;
+            StandBy = standBy;
             actualLoad = 0;
             this.maxSpeed = maxSpeed;
             origin = quarter;
             location = origin;
             this.type = type;
+        }
+
+        protected Operator(int id, double maxSpeed, bool standBy, OperatorTypes type)
+        {
             Id = id;
-            StandBy = false;
+            this.id = id;
+            StandBy = standBy;
+            this.standBy = standBy;
+            actualLoad = 0;
+            MaxSpeed = maxSpeed;
+            this.maxSpeed = maxSpeed;
+            Type = type;
         }
 
         protected double CalculateActualSpeed()
@@ -60,8 +73,8 @@ namespace TP_Integrador.Operators
 
             while(loop > 0)
             {
-                speed = -maxSpeed * 0.05;
-                loop--;
+                speed -= maxSpeed * 0.05;
+                loop --;
             }
 
             return speed;
@@ -71,7 +84,7 @@ namespace TP_Integrador.Operators
         {
             bool added = false;
 
-            if (kg < maxLoad && (kg + actualLoad) < maxLoad)
+            if (kg <= maxLoad && (kg + actualLoad) <= maxLoad)
             {
                 actualLoad += kg;
                 added = true;
@@ -117,9 +130,9 @@ namespace TP_Integrador.Operators
                 case LocationTypes.Verter:
                     {
                         int chance = rand.Next(0, 100);
-                        if(chance < 5)
+                        if(chance == 1)
                         {
-                            //damage
+                            battery.PerforateBattery();
                         }
                     }
                     break;
@@ -141,10 +154,12 @@ namespace TP_Integrador.Operators
 
             #region Set prohibited location types
             List<LocationTypes> prohibitedLocationTypes = new List<LocationTypes>();
+
             if(type == OperatorTypes.M8 || type == OperatorTypes.K9)
             {
                 prohibitedLocationTypes.Add(LocationTypes.Lake);
             }
+
             if (safeRoute)
             {
                 prohibitedLocationTypes.Add(LocationTypes.Verter);
@@ -234,6 +249,7 @@ namespace TP_Integrador.Operators
                     }
                     index--;
                 }
+
                 route.Reverse();                
                 distance = CalculateDistanceToTravel(route);
                 #endregion
@@ -245,6 +261,11 @@ namespace TP_Integrador.Operators
         public Location GetLocation()
         {
             return location;
+        }
+
+        public Quarter GetOrigin()
+        {
+            return origin;
         }
 
         public int GetId()
@@ -267,21 +288,20 @@ namespace TP_Integrador.Operators
             bool done = false;
             bool canMake = CalculateRoute(destiny, map, safeTravel, out List<Location> route, out int distance);            
             double speed = CalculateActualSpeed();
-            int milliAmpsToConsume = Convert.ToInt32((distance * 1000) / speed);        
+            int milliAmpsToConsume = Convert.ToInt32((distance * 1000) / speed);
+            bool checkBattery = battery.EnoughBattery(milliAmpsToConsume);
 
-            if (!standBy && canMake && battery.EnoughBattery(milliAmpsToConsume))
-            {
-                map.PrintRoute(route, location);
+            if (!standBy && canMake && checkBattery)
+            {               
                 foreach (Location location in route)
-                {
-                    this.location = location;
+                {                    
                     Damage(location);
                 }
-                if(this.location == destiny)
-                {
-                    battery.ConsumeBattery(milliAmpsToConsume);
-                    done = true;
-                }                
+
+                map.PrintRoute(route, location);
+                location = destiny;
+                battery.ConsumeBattery(milliAmpsToConsume);
+                done = true;                               
             }
 
             map.ResetLocationsParameters();
@@ -293,8 +313,10 @@ namespace TP_Integrador.Operators
         {
             bool done = false;
             int batteryNeeded = opReciever.battery.GetBatteryNeeded();
+            bool checkLocation = location.Equals(opReciever.location);
+            bool portsConnected = battery.IsPortConnected() && opReciever.battery.IsPortConnected();
 
-            if (!standBy && location.Equals(opReciever.location))
+            if (!standBy && checkLocation && portsConnected)
             {
                 opReciever.battery.ChargeBattery(battery.GetCharge());
                 battery.ConsumeBattery(batteryNeeded);

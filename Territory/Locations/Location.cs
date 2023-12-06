@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Creado por Ignacio Rivera
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -112,7 +113,7 @@ namespace TP_Integrador.Territory.Locations
         public int GetCost()
         {
             return cost;
-        }
+        }        
 
         public Location GetParent()
         {
@@ -125,7 +126,7 @@ namespace TP_Integrador.Territory.Locations
             heuristic = 0;
             totalCost = 0;
             parent = null;
-        }
+        }        
 
         public override string ToString()
         {

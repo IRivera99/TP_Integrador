@@ -12,7 +12,9 @@ namespace TP_Integrador.Operators
         int maxMilliAmps;
         int actualMaxMilliAmps;
         int actualMilliAmps;
+        bool perforated;
         bool damaged;
+        bool conectedPort;
 
         public Battery(int maxMilliAmps)
         {            
@@ -20,11 +22,18 @@ namespace TP_Integrador.Operators
             actualMaxMilliAmps = maxMilliAmps;
             actualMilliAmps = maxMilliAmps; 
             damaged = false;
+            perforated = false;
+            conectedPort = true;
         }
 
         public bool EnoughBattery(int requestedMilliAmps)
         {
             bool enough = false;
+
+            if (perforated)
+            {
+                requestedMilliAmps *= 5;
+            }
 
             if (requestedMilliAmps <= actualMilliAmps)
             {
@@ -52,6 +61,10 @@ namespace TP_Integrador.Operators
         public bool ConsumeBattery(int mAh)
         {
             bool consumed = false;
+            if (perforated)
+            {
+                mAh *= 5;
+            }
 
             if (EnoughBattery(mAh))
             {
@@ -86,21 +99,45 @@ namespace TP_Integrador.Operators
 
         public bool DamageBattery()
         {
-            if (actualMaxMilliAmps - Convert.ToInt32(actualMaxMilliAmps * 0.2) > 0 && !this.damaged)
+            if (actualMaxMilliAmps - Convert.ToInt32(actualMaxMilliAmps * 0.2) > 0 && !damaged)
             {
                 actualMaxMilliAmps -= Convert.ToInt32(actualMaxMilliAmps * 0.2);
                 if(actualMilliAmps > actualMaxMilliAmps)
                 {
                     actualMilliAmps = actualMaxMilliAmps;
                 }
-                this.damaged = true;
+                damaged = true;
             }                        
-            return this.damaged;
+            return damaged;
         }
 
-        public void Repair()
+        public bool PerforateBattery()
+        {
+            perforated = true;
+            return perforated;
+        }
+
+        public bool DisconnectPort()
+        {
+            conectedPort = false;
+            return conectedPort;
+        }
+
+        public bool IsPerorated()
+        {
+            return perforated;
+        }
+
+        public bool IsPortConnected()
+        {
+            return conectedPort;
+        }
+
+        public void ChangeBattery()
         {
             actualMaxMilliAmps = maxMilliAmps;
+            perforated = false;
+            conectedPort = true;
         }
     }
 }

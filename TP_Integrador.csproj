@@ -51,7 +51,6 @@
     <Compile Include="Operators\Types\K9.cs" />
     <Compile Include="Territory\Locations\LocationTypes.cs" />
     <Compile Include="Operators\Types\M8.cs" />
-    <Compile Include="Menu.cs" />
     <Compile Include="Operators\Operator.cs" />
     <Compile Include="Operators\Types\OperatorTypes.cs" />
     <Compile Include="Program.cs" />

@@ -1,30 +1,35 @@
-Una importante empresa de robótica en Buenos Aires, Sky.Net, necesita un nuevo software donde simular sus múltiples entidades mecánicas para optimizar su inventario y tener un mejor control de sus capacidades y su estado.
+Sky.net ha solicitado que continuemos el development del programa que realizamos originalmente, y nos han llegado nuevos requerimientos.
 
-Sky.Net tiene varios robots a su disposición, que llamamos operadores y, que por ahora vienen en 3 tipos principales. Estos operadores son drásticamente diferentes unos de otros: Drones voladores de varias hélices bajo el acrónimo “UAV”, unidades cuadrúpedas “K9”, y entidades semi-humanoides de carga “M8”.
+Sky.Net tiene un terreno de 100 kilómetros cuadrados para iterar diferentes pruebas de movilidad y rendimiento en sus operadores. Nos han pedido que creemos una simulación dinámica de este terreno donde podamos randomizar diferentes entornos, donde cada kilómetro cuadrado represente un tipo de localización.
 
-La empresa trabaja desde un cuartel general que tiene visibilidad del estado de sus operadores mecánicos y puede asignar órdenes directamente. Todos los operadores tienen un identificador único*, una batería**, un estado general, un valor de carga máxima en kilos*** y una velocidad óptima de movimiento**** en kilómetros/hora y una localización actual*****. Pueden haber más datos esenciales sin listar.
+Estas localizaciones se clasifican por tipo.
 
-*Somos libres de usar el sistema que creamos más conveniente para esto.
-**El tipo de batería es diferente para todos los tipos de operador y se calcula en mAh (miliAmperios por hora, donde 1000mAh quiere decir 1 hora de uso). En orden según su tipo tienen una batería de 4000 mAh, 6500 mAh, 12250 mAh.
-***La carga máxima se divide por tipo en 5kg - 40 kg - 250 kg 
-****Se estima que una entidad robótica en viaje se mueve constantemente o por promedio a esta velocidad.
-*****Puede ser un string de momento.
+Tipos de localización:
+	- Terreno baldío, planicie, bosque, sector urbano: terrenos comunes sin efectos
+	- Vertedero: Sector lleno de basura, al pasar hay una chance de 5% de dañar componentes del Operador. Debemos simular esto con un randomizador.
+	- Lago: Un sector inundado, las unidades K9 y M8 no pueden pasar.
+	- Vertedero electrónico: Un sector lleno de basura electrónica, no tiene chance de causar daño físico al operador pero las ondas electromagnéticas de los dispositivos dañan las baterías y reducen su capacidad máxima en un 20% permanentemente.
+	- Cuartel: un punto de control donde los operadores pueden recargar batería o ser reparados. Pueden existir varios, pero nunca más de 3.
+	- Sitio de reciclaje: Un sector dedicado a transformar basura en recursos útiles. Estos sitios poseen puntos de recarga para los operadores pero no de mantenimiento. Existen un máximo de 5 en todo el terreno.
+	
+Nos han solicitado la siguiente funcionalidad:
+1) Simular el terreno de 100 kilómetros cuadrados con varios tipos de localizaciones generados aleatoriamente.
+2) Actualizar las rutinas de movimiento - no es necesario codear un movimiento diagonal.
+	A) Generar rutinas para ordenar un operador moverse a una coordenada o localización en especial
+	B) Opcional: Programar una rutina que genere una ruta óptima (es decir, sin peligro) y otra que genere una ruta directa.
+3) Persistencia de datos. Al iniciar el programa, nos debe preguntar si queremos cargar una simulación previa o generar una nueva simulación.
+	A) Nos han pedido que guardemos todos los datos relevantes: El terreno de 100*100 y el estado de todos los operadores. Somos libres de decidir cómo y cuándo hacerlo.
+	B) Somos libres de utilizar el sistema que creamos óptimo para guardar datos, pero debe ser dinámico para que pueda utilizarse en otras computadoras.
+4) Actualizar rutinas generales para adaptarse a nuestro nuevo diseño.
+5) Opcional: Sistema de tiempo. No nos han solicitado un sistema para calcular el tiempo de operaciones o asignar órdenes en ‘tiempo real’. Un sistema tal sería laborioso, pero muy recompensante.
 
-Aparte, todos los operadores son capaces de ciertas acciones en común.
-1) Moverse una cantidad de kilómetros hacia otra localización, consumiendo correspondientemente la batería. Nos mencionaron que por cada 10% utilizados de carga, los operadores se mueven un 5% más lento.
-2) Transferir una carga de batería de un operador a otro, considerando que deben estar en la misma localización.
-3) Transferir una carga física de una entidad a otra, usando sentido común.
-4) Volver al cuartel y transferir toda la carga física.
-5) Volver al cuartel y cargar batería.
-
-Del cuartel, podemos realizar varias operaciones en particular:
-1) Listar el estado de todos los operadores.
-2) Listar el estado de todos los operadores que estén en cierta localización.
-3) Hacer un total recall (llamado y retorno) general a todos los operadores.
-4) Seleccionar un operador en específico y:
-  a) Enviarlo a una localización en especial.
-  b) indicar retorno a cuartel
-  c) cambiar estado a STANDBY - una entidad en STANDBY no puede ser utilizada por comandos generales.
-5) Agregar o remover operadores de la reserva.
-
-No es obligación crear un menú de opciones para acceder a la funcionalidad del programa, pero por motivos de testing, quizá sea adecuado.
+5) Nueva funcionalidad:
+	A) Orden general: Todos los operadores que no estén ocupados actualmente deben dirigirse al vertedero más cercano y recoger su cantidad máxima de carga para traer al sitio de reciclaje más cercano.
+	B) Orden general: Todos los operadores que estén dañados deben volver a un cuartel para mantenimiento.
+	C) Cambiar Batería: Reemplaza una batería dañada.
+	D) Simular daño: Un operador puede sufrir estos diferentes daños:
+		>MOTOR COMPROMETIDO: Reduce su velocidad promedio a la mitad.
+		>SERVO ATASCADO: No puede realizar operaciones de carga y descarga física
+		>BATERIA PERFORADA: Pierde batería un 500% más rápido en cada operación
+		>PUERTO BATERIA DESCONECTADO: No puede realizar operaciones de carga, recarga o transferencia de batería
+		>PINTURA RAYADA: No tiene efecto

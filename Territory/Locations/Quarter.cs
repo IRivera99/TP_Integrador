@@ -14,13 +14,13 @@ namespace TP_Integrador.Territory.Locations
     {
         List<Operator> operators;
         Map map = null;
-        string name;
 
-        public Quarter(string name, int coordX, int coordY) : base(coordX, coordY)
+        public string Name { get;}
+
+        public Quarter(string name, int coordX, int coordY) : base(coordX, coordY, type: LocationTypes.Quarter)
         {            
             operators = new List<Operator>();
-            type = LocationTypes.Quarter;
-            this.name = name;
+            Name = name;
         }
 
         private OperatorTypes GetRandomOperatorType(Random random)
@@ -56,22 +56,7 @@ namespace TP_Integrador.Territory.Locations
         public Operator GetOperator(Location location)
         {
             return operators.Find(o => o.GetLocation() == location);
-        }
-
-        public bool AddOperator(Operator op)
-        {
-            bool done = false;
-
-            Operator sameId = operators.Find(o => o.GetId() == op.GetId());
-
-            if (sameId == null)
-            {
-                operators.Add(op);
-                done = true;
-            }
-
-            return done;
-        }
+        }        
 
         public bool RemoveOperator(int id)
         {
@@ -145,6 +130,21 @@ namespace TP_Integrador.Territory.Locations
             return id;
         }
 
+        public bool AddOperator(Operator op)
+        {
+            bool done = false;
+
+            Operator sameId = operators.Find(o => o.GetId() == op.GetId());
+
+            if (sameId == null)
+            {
+                operators.Add(op);
+                done = true;
+            }
+
+            return done;
+        }
+
         public void AddRandomOperatorsToQuarter(int amount)
         {
             Random random = new Random();
@@ -173,6 +173,14 @@ namespace TP_Integrador.Territory.Locations
             }
 
             Console.WriteLine($"{GetOperators().Count} operadores añadidos");
+        }
+
+        public void AddOperatorsToQuarter(List<Operator> operators)
+        {
+            foreach (Operator op in operators)
+            {
+                AddOperator(op);
+            }
         }
     }
 }

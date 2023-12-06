@@ -1,5 +1,7 @@
-﻿using System;
+﻿//Creado por Ignacio Rivera
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,15 +13,18 @@ namespace TP_Integrador.Territory
     {
         private static Map _instance;
         Dictionary<(int coordX, int coordY), Location> map;
-        const int maxQuarters = 3;
-        const int maxRecyclingPoints = 5;
+        private static int maxQuarters = 3;
+        private static int maxRecyclingPoints = 5;
         readonly Random rand = new Random();
 
-        public Dictionary<(int coordX, int coordY), Location> MapP { get;}
+        private Map()
+        {
+            map = new Dictionary<(int coordX, int coordY), Location> ();
+        }
 
         private Map(int maxX, int maxY) 
         {
-            map = new Dictionary<(int, int), Location>();            
+            map = new Dictionary<(int coordX, int coordY), Location>();            
             if((maxX *  maxY) < 8)
             {
                 maxX = 3;
@@ -27,22 +32,32 @@ namespace TP_Integrador.Territory
             }
             MapBuilder(maxX, maxY);
             AsignMapToQuarters();
-            MapP = map;
         }       
 
         private void MapBuilder(int maxX, int maxY)
         {
             List<LocationTypes> types = GetLocationsTypesList(maxX * maxY);
             int selector;
+            int quarters = 0;
+            string quarterName;
 
             for (int i = 0; i < maxX; i++)
             {
                 for (int j = 0; j < maxY; j++)
                 {
                     selector = rand.Next(0, types.Count);
+
                     if (types[selector] == LocationTypes.Quarter)
-                    {
-                        map.Add((i, j), new Quarter($"Cuartel {i}{j}", i, j));
+                    {                        
+                        switch (quarters)
+                        {
+                            case 0: quarterName = "Alfa"; break;
+                            case 1: quarterName = "Beta"; break;
+                            case 2: quarterName = "Gamma"; break;
+                            default: quarterName = $"{i}{j}"; break;
+                        }
+                        map.Add((i, j), new Quarter($"Cuartel {quarterName}", i, j));
+                        quarters++;
                     }
                     else
                     {
@@ -87,15 +102,15 @@ namespace TP_Integrador.Territory
         {
             LocationTypes type;
             int selector = rand.Next(0, 100);
-            if (selector < 70)
+            if (selector < 80)
             {
                 type = LocationTypes.Common;
             }
-            else if (selector < 80)
+            else if (selector < 85)
             {
                 type = LocationTypes.Verter;
             }
-            else if (selector < 90)
+            else if (selector < 95)
             {
                 type = LocationTypes.Lake;
             }
@@ -147,9 +162,7 @@ namespace TP_Integrador.Territory
         {
             if (_instance == null)
             {
-                int maxX = 100;
-                int maxY = 100;
-                _instance = new Map(maxX, maxY);
+                _instance = new Map();
             }
             return _instance;
         }
@@ -161,6 +174,16 @@ namespace TP_Integrador.Territory
                 _instance = new Map(maxX, maxY);
             }
             return _instance;
+        }
+
+        public static int GetMaxQuarters()
+        {
+            return maxQuarters;
+        }
+
+        public static int GetMaxRecyclingPoints()
+        {
+            return maxRecyclingPoints;
         }
 
         public Dictionary<(int, int), Location> GetMap()
@@ -210,6 +233,38 @@ namespace TP_Integrador.Territory
             } 
         }
 
+        public bool AddLocationsToMap(List<Location> locations)
+        {
+            bool added = false;
+
+            if (_instance == null)
+            {
+                GetInstance();
+            }
+
+            try
+            {
+                foreach (Location location in locations)
+                {
+                    map.Add((location.CoordX, location.CoordY), location);
+                }
+
+                AsignMapToQuarters();
+
+                added = true;
+            }
+            catch (ArgumentNullException)
+            {
+                Console.WriteLine("Localización/es nula/s, no se puede cargar...");
+            }
+            catch (ArgumentException)
+            {
+                Console.WriteLine($"Error al cargar localización/es...");
+            }        
+
+            return added;
+        }        
+
         public void DebugTypesPorcentages()
         {
             int common = 0, verter = 0, lake = 0, quarter = 0, recycling = 0, elecVert = 0;
@@ -232,7 +287,7 @@ namespace TP_Integrador.Territory
                 $"Recy: {recycling} {recycling * 100 / max}% | " +
                 $"ElVe: {elecVert} {elecVert * 100 / max}% | " +
                 $"Qua: {quarter} {quarter * 100 / max}%");
-        }
+        }        
 
         public void PrintRoute(List<Location> route, Location initialLocation)
         {
@@ -313,12 +368,7 @@ namespace TP_Integrador.Territory
                         {
                             Console.ForegroundColor = ConsoleColor.Magenta;
                             Console.Write((int)loc.GetLocationType() + $" ");
-                        }
-                        else if (loc.GetCoords() == (13, 3))
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write((int)loc.GetLocationType() + $" ");
-                        }
+                        }                        
                         else
                         {
                             Console.ForegroundColor = ConsoleColor.White;
